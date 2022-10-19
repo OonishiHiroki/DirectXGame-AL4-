@@ -8,8 +8,7 @@
 /// <summary>
 /// スプライト
 /// </summary>
-class Sprite
-{
+class Sprite {
 private: // エイリアス
 	// Microsoft::WRL::を省略
 	template <class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
@@ -23,8 +22,7 @@ public: // サブクラス
 	/// <summary>
 	/// 頂点データ構造体
 	/// </summary>
-	struct VertexPosUv
-	{
+	struct VertexPosUv {
 		XMFLOAT3 pos; // xyz座標
 		XMFLOAT2 uv;  // uv座標
 	};
@@ -32,10 +30,17 @@ public: // サブクラス
 	/// <summary>
 	/// 定数バッファ用データ構造体
 	/// </summary>
-	struct ConstBufferData
-	{
+	struct ConstBufferData {
 		XMFLOAT4 color;	// 色 (RGBA)
 		XMMATRIX mat;	// ３Ｄ変換行列
+	};
+
+	//パイプラインセット
+	struct PipelineSet {
+		// ルートシグネチャ
+		ComPtr<ID3D12RootSignature> rootSignature;
+		// パイプラインステートオブジェクト
+		ComPtr<ID3D12PipelineState> pipelineState;
 	};
 
 public: // 静的メンバ関数
@@ -53,7 +58,7 @@ public: // 静的メンバ関数
 	/// </summary>
 	/// <param name="texnumber">テクスチャ番号</param>
 	/// <param name="filename">画像ファイル名</param>
-	static void LoadTexture(UINT texnumber, const wchar_t*filename);
+	static void LoadTexture(UINT texnumber, const wchar_t* filename);
 
 	/// <summary>
 	/// 描画前処理
@@ -89,10 +94,6 @@ private: // 静的メンバ変数
 	static UINT descriptorHandleIncrementSize;
 	// コマンドリスト
 	static ID3D12GraphicsCommandList* cmdList;
-	// ルートシグネチャ
-	static ComPtr<ID3D12RootSignature> rootSignature;
-	// パイプラインステートオブジェクト
-	static ComPtr<ID3D12PipelineState> pipelineState;
 	// 射影行列
 	static XMMATRIX matProjection;
 	// デスクリプタヒープ
@@ -105,7 +106,7 @@ public: // メンバ関数
 	/// コンストラクタ
 	/// </summary>
 	Sprite(UINT texNumber, XMFLOAT2 position, XMFLOAT2 size, XMFLOAT4 color, XMFLOAT2 anchorpoint, bool isFlipX, bool isFlipY);
-	
+
 	/// <summary>
 	/// 初期化
 	/// </summary>
@@ -123,7 +124,7 @@ public: // メンバ関数
 	/// </summary>
 	/// <param name="position">座標</param>
 	void SetPosition(const XMFLOAT2& position);
-	
+
 	/// <summary>
 	/// サイズの設定
 	/// </summary>
@@ -171,7 +172,7 @@ private: // メンバ変数
 	// 頂点バッファビュー
 	D3D12_VERTEX_BUFFER_VIEW vbView{};
 	// テクスチャ番号
-	UINT texNumber = 0; 
+	UINT texNumber = 0;
 	// Z軸回りの回転角
 	float rotation = 0.0f;
 	// 座標
@@ -181,9 +182,9 @@ private: // メンバ変数
 	// アンカーポイント
 	XMFLOAT2 anchorpoint = { 0, 0 };
 	// ワールド行列
-	XMMATRIX matWorld{};		
+	XMMATRIX matWorld{};
 	// 色
-	XMFLOAT4 color = { 1, 1, 1, 1 }; 
+	XMFLOAT4 color = { 1, 1, 1, 1 };
 	// 左右反転
 	bool isFlipX = false;
 	// 上下反転
