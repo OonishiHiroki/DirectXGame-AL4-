@@ -112,7 +112,7 @@ SoundData SoundLoadWave(const char* filename) {
 	soundData.pBuffer = reinterpret_cast<BYTE*>(pBuffer);
 	soundData.bufferSize = data.size;
 
-	return soundData = {};
+	return soundData;
 
 }
 
@@ -159,8 +159,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	//音声読み込み
 	SoundData soundData1 = SoundLoadWave("Resources/Alarm01.wav");
-	//音声再生
-	SoundPlayWave(xAudio2.Get(), soundData1);
 
 	// 汎用機能
 	WinApp* win = nullptr;
@@ -199,6 +197,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//マスターボイスを生成
 	result = xAudio2->CreateMasteringVoice(&masterVoice);
 
+	//音声再生
+	SoundPlayWave(xAudio2.Get(), soundData1);
+
 	// メインループ
 	while (true) {
 		// メッセージ処理
@@ -224,10 +225,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	// ゲームウィンドウの破棄
 	win->TerminateGameWindow();
 
-	////XAudio2解放
-	//xAudio2.Reset();
-	////音声データ解放
-	//SoundUnload(&soundData1);
+	//XAudio2解放
+	xAudio2.Reset();
+	//音声データ解放
+	SoundUnload(&soundData1);
 
 	return 0;
 }
