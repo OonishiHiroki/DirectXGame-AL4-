@@ -324,7 +324,7 @@ void Object3d::InitializeGraphicsPipeline() {
 
 }
 
-void Object3d::LoadTexture(const std::string& directoryPath, const std::string& filename) {
+bool Object3d::LoadTexture(const std::string& directoryPath, const std::string& filename) {
 	HRESULT result = S_FALSE;
 
 	TexMetadata metadata{};
@@ -404,7 +404,7 @@ void Object3d::LoadTexture(const std::string& directoryPath, const std::string& 
 									 &srvDesc, //テクスチャ設定情報
 									 cpuDescHandleSRV
 	);
-
+	return true;
 }
 
 void Object3d::CreateModel() {
@@ -513,8 +513,6 @@ void Object3d::CreateModel() {
 	//ファイルを閉じる
 	file.close();
 
-
-
 	std::vector<VertexPosNormalUv> realVertices;
 
 
@@ -612,19 +610,19 @@ void Object3d::LoadMaterial(const std::string& directoryPath, const std::string&
 			//マテリアル名読み込み
 			line_stream >> material.name;
 		}
-		//先頭文字列がKaならアンビエント名
+		//先頭文字列がKaならアンビエント色
 		if (key == "Ka") {
 			line_stream >> material.ambient.x;
 			line_stream >> material.ambient.y;
 			line_stream >> material.ambient.z;
 		}
-		//先頭文字列がKdならマテリアル名
+		//先頭文字列がKdならディフューズ色
 		if (key == "Kd") {
 			line_stream >> material.diffuse.x;
 			line_stream >> material.diffuse.y;
 			line_stream >> material.diffuse.z;
 		}
-		//先頭文字列がnewmtlならマテリアル名
+		//先頭文字列がKsならスペキュラー色
 		if (key == "Ks") {
 			line_stream >> material.specular.x;
 			line_stream >> material.specular.y;

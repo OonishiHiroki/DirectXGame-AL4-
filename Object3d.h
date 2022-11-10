@@ -46,6 +46,22 @@ public: // サブクラス
 		float alpha;		//アルファ
 	};
 
+	//マテリアル
+	struct Material {
+		std::string name;	//マテリアル名
+		XMFLOAT3 ambient;	//アンビエント影響度
+		XMFLOAT3 diffuse;	//ディフューズ影響度
+		XMFLOAT3 specular;	//スペキュラー影響度
+		float alpha;		//アルファ
+		std::string textureFilename; //テクスチャファイル名
+		//コンストラクタ
+		Material() {
+			ambient = { 0.3f,0.3f,0.3f };
+			diffuse = { 0.0f,0.0f,0.0f };
+			specular = { 0.0f,0.0f,0.0f };
+			alpha = 1.0f;
+		}
+	};
 
 private: // 定数
 	static const int division = 50;					// 分割数
@@ -110,6 +126,22 @@ public: // 静的メンバ関数
 	/// <param name="move">移動量</param>
 	static void CameraMoveVector(XMFLOAT3 move);
 
+	/// <summary>
+	/// モデル作成
+	/// </summary>
+	static void CreateModel();
+
+	/// <summary>
+	/// マテリアル
+	/// </summary>
+	static void LoadMaterial(const std::string& directoryPath, const std::string& filename);
+
+
+	/// <summary>
+	/// テクスチャ読み込み
+	/// </summary>
+	/// <returns> 成否 </returns>
+	static bool LoadTexture(const std::string& directoryPath, const std::string& filename);
 
 private: // 静的メンバ変数
 	//// デバイス
@@ -155,7 +187,8 @@ private: // 静的メンバ変数
 	static XMFLOAT3 target;
 	// 上方向ベクトル
 	static XMFLOAT3 up;
-
+	//マテリアル
+	static Material material;
 
 private:// 静的メンバ関数
 	/// <summary>
@@ -179,17 +212,7 @@ private:// 静的メンバ関数
 	/// <summary>
 	/// テクスチャ読み込み
 	/// </summary>
-	static void LoadTexture(const std::string& directoryPath, const std::string& filename);
-
-	/// <summary>
-	/// モデル作成
-	/// </summary>
-	static void CreateModel();
-
-	/// <summary>
-	/// マテリアル
-	/// </summary>
-	static void LoadMaterial(const std::string& directoryPath, const std::string& filename);
+	//static bool LoadTexture(const std::string& directoryPath, const std::string& filename);
 
 	/// <summary>
 	/// ビュー行列を更新
@@ -237,25 +260,6 @@ private: // メンバ変数
 	XMMATRIX matWorld;
 	// 親オブジェクト
 	Object3d* parent = nullptr;
-
-	//マテリアル
-	struct Material {
-		std::string name;	//マテリアル名
-		XMFLOAT3 ambient;	//アンビエント影響度
-		XMFLOAT3 diffuse;	//ディフューズ影響度
-		XMFLOAT3 specular;	//スペキュラー影響度
-		float alpha;		//アルファ
-		std::string textureFilename; //テクスチャファイル名
-		//コンストラクタ
-		Material() {
-			ambient = { 0.3f,0.3f,0.3f };
-			diffuse = { 0.0f,0.0f,0.0f };
-			specular = { 0.0f,0.0f,0.0f };
-			alpha = 1.0f;
-		}
-	};
-	//マテリアル
-	static Material material;
 
 };
 
