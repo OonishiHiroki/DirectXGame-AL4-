@@ -11,6 +11,7 @@ GameScene::~GameScene()
 {
 	delete spriteBG;
 	delete object3d;
+	delete model;
 	delete sprite1;
 	delete sprite2;
 }
@@ -43,6 +44,9 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input)
 	// 3Dオブジェクト生成
 	object3d = Object3d::Create();
 	object3d->Update();
+
+	//モデル生成
+	model = Model::
 
 	//座標{0,0}に、テクスチャ2番のスプライトを生成
 	sprite1 = Sprite::Create(2, { 0,0 });
