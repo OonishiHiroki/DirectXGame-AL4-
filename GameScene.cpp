@@ -45,9 +45,6 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input)
 	object3d = Object3d::Create();
 	object3d->Update();
 
-	//モデル生成
-	model = Model::
-
 	//座標{0,0}に、テクスチャ2番のスプライトを生成
 	sprite1 = Sprite::Create(2, { 0,0 });
 	//座標{500,500}に、テクスチャ2番のスプライトを生成
