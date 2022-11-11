@@ -5,12 +5,13 @@
 #include <sstream>
 #include <string>
 #include <vector>
+using namespace std;
+
 
 #pragma comment(lib, "d3dcompiler.lib")
 
 using namespace DirectX;
 using namespace Microsoft::WRL;
-using namespace std;
 
 /// <summary>
 /// 静的メンバ変数の実体
@@ -38,17 +39,17 @@ D3D12_INDEX_BUFFER_VIEW Object3d::ibView{};
 //Object3d::VertexPosNormalUv Object3d::vertices[vertexCount];
 //unsigned short Object3d::indices[planeCount * 3];
 
+
 std::vector<Object3d::VertexPosNormalUv> Object3d::vertices;
 std::vector<unsigned short> Object3d::indices;
 
-Object3d::Material Object3d::material;
-
-void Object3d::StaticInitialize(ID3D12Device* device, int window_width, int window_height) {
+void Object3d::StaticInitialize(ID3D12Device * device, int window_width, int window_height)
+{
 	// nullptrチェック
 	assert(device);
 
 	Object3d::device = device;
-
+		
 	// デスクリプタヒープの初期化
 	InitializeDescriptorHeap();
 
@@ -58,15 +59,16 @@ void Object3d::StaticInitialize(ID3D12Device* device, int window_width, int wind
 	// パイプライン初期化
 	InitializeGraphicsPipeline();
 
-	//// テクスチャ読み込み
-	//LoadTexture();
+	// テクスチャ読み込み
+	LoadTexture();
 
 	// モデル生成
 	CreateModel();
 
 }
 
-void Object3d::PreDraw(ID3D12GraphicsCommandList* cmdList) {
+void Object3d::PreDraw(ID3D12GraphicsCommandList * cmdList)
+{
 	// PreDrawとPostDrawがペアで呼ばれていなければエラー
 	assert(Object3d::cmdList == nullptr);
 
@@ -81,12 +83,14 @@ void Object3d::PreDraw(ID3D12GraphicsCommandList* cmdList) {
 	cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
 
-void Object3d::PostDraw() {
+void Object3d::PostDraw()
+{
 	// コマンドリストを解除
 	Object3d::cmdList = nullptr;
 }
 
-Object3d* Object3d::Create() {
+Object3d * Object3d::Create()
+{
 	// 3Dオブジェクトのインスタンスを生成
 	Object3d* object3d = new Object3d();
 	if (object3d == nullptr) {
@@ -107,19 +111,22 @@ Object3d* Object3d::Create() {
 	return object3d;
 }
 
-void Object3d::SetEye(XMFLOAT3 eye) {
+void Object3d::SetEye(XMFLOAT3 eye)
+{
 	Object3d::eye = eye;
 
 	UpdateViewMatrix();
 }
 
-void Object3d::SetTarget(XMFLOAT3 target) {
+void Object3d::SetTarget(XMFLOAT3 target)
+{
 	Object3d::target = target;
 
 	UpdateViewMatrix();
 }
 
-void Object3d::CameraMoveVector(XMFLOAT3 move) {
+void Object3d::CameraMoveVector(XMFLOAT3 move)
+{
 	XMFLOAT3 eye_moved = GetEye();
 	XMFLOAT3 target_moved = GetTarget();
 
@@ -135,11 +142,10 @@ void Object3d::CameraMoveVector(XMFLOAT3 move) {
 	SetTarget(target_moved);
 }
 
-
-
-void Object3d::InitializeDescriptorHeap() {
+void Object3d::InitializeDescriptorHeap()
+{
 	HRESULT result = S_FALSE;
-
+	
 	// デスクリプタヒープを生成	
 	D3D12_DESCRIPTOR_HEAP_DESC descHeapDesc = {};
 	descHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
@@ -155,7 +161,8 @@ void Object3d::InitializeDescriptorHeap() {
 
 }
 
-void Object3d::InitializeCamera(int window_width, int window_height) {
+void Object3d::InitializeCamera(int window_width, int window_height)
+{
 	// ビュー行列の生成
 	matView = XMMatrixLookAtLH(
 		XMLoadFloat3(&eye),
@@ -175,7 +182,8 @@ void Object3d::InitializeCamera(int window_width, int window_height) {
 	);
 }
 
-void Object3d::InitializeGraphicsPipeline() {
+void Object3d::InitializeGraphicsPipeline()
+{
 	HRESULT result = S_FALSE;
 	ComPtr<ID3DBlob> vsBlob; // 頂点シェーダオブジェクト
 	ComPtr<ID3DBlob> psBlob;	// ピクセルシェーダオブジェクト
@@ -183,7 +191,7 @@ void Object3d::InitializeGraphicsPipeline() {
 
 	// 頂点シェーダの読み込みとコンパイル
 	result = D3DCompileFromFile(
-		L"OBJVertexShader.hlsl",	// シェーダファイル名
+		L"Resources/Shaders/BasicVertexShader.hlsl",	// シェーダファイル名
 		nullptr,
 		D3D_COMPILE_STANDARD_FILE_INCLUDE, // インクルード可能にする
 		"main", "vs_5_0",	// エントリーポイント名、シェーダーモデル指定
@@ -196,8 +204,8 @@ void Object3d::InitializeGraphicsPipeline() {
 		errstr.resize(errorBlob->GetBufferSize());
 
 		std::copy_n((char*)errorBlob->GetBufferPointer(),
-					errorBlob->GetBufferSize(),
-					errstr.begin());
+			errorBlob->GetBufferSize(),
+			errstr.begin());
 		errstr += "\n";
 		// エラー内容を出力ウィンドウに表示
 		OutputDebugStringA(errstr.c_str());
@@ -206,7 +214,7 @@ void Object3d::InitializeGraphicsPipeline() {
 
 	// ピクセルシェーダの読み込みとコンパイル
 	result = D3DCompileFromFile(
-		L"OBJPixelShader.hlsl",	// シェーダファイル名
+		L"Resources/Shaders/BasicPixelShader.hlsl",	// シェーダファイル名
 		nullptr,
 		D3D_COMPILE_STANDARD_FILE_INCLUDE, // インクルード可能にする
 		"main", "ps_5_0",	// エントリーポイント名、シェーダーモデル指定
@@ -219,8 +227,8 @@ void Object3d::InitializeGraphicsPipeline() {
 		errstr.resize(errorBlob->GetBufferSize());
 
 		std::copy_n((char*)errorBlob->GetBufferPointer(),
-					errorBlob->GetBufferSize(),
-					errstr.begin());
+			errorBlob->GetBufferSize(),
+			errstr.begin());
 		errstr += "\n";
 		// エラー内容を出力ウィンドウに表示
 		OutputDebugStringA(errstr.c_str());
@@ -294,13 +302,9 @@ void Object3d::InitializeGraphicsPipeline() {
 	descRangeSRV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0); // t0 レジスタ
 
 	// ルートパラメータ
-	/*CD3DX12_ROOT_PARAMETER rootparams[2];
+	CD3DX12_ROOT_PARAMETER rootparams[2];
 	rootparams[0].InitAsConstantBufferView(0, 0, D3D12_SHADER_VISIBILITY_ALL);
-	rootparams[1].InitAsDescriptorTable(1, &descRangeSRV, D3D12_SHADER_VISIBILITY_ALL);*/
-	CD3DX12_ROOT_PARAMETER rootparams[3];
-	rootparams[0].InitAsConstantBufferView(0, 0, D3D12_SHADER_VISIBILITY_ALL);
-	rootparams[1].InitAsConstantBufferView(1, 0, D3D12_SHADER_VISIBILITY_ALL);
-	rootparams[2].InitAsDescriptorTable(1, &descRangeSRV, D3D12_SHADER_VISIBILITY_ALL);
+	rootparams[1].InitAsDescriptorTable(1, &descRangeSRV, D3D12_SHADER_VISIBILITY_ALL);
 
 	// スタティックサンプラー
 	CD3DX12_STATIC_SAMPLER_DESC samplerDesc = CD3DX12_STATIC_SAMPLER_DESC(0);
@@ -324,27 +328,16 @@ void Object3d::InitializeGraphicsPipeline() {
 
 }
 
-bool Object3d::LoadTexture(const std::string& directoryPath, const std::string& filename) {
+void Object3d::LoadTexture()
+{
 	HRESULT result = S_FALSE;
 
 	TexMetadata metadata{};
 	ScratchImage scratchImg{};
 
-	//ファイルパスを結合
-	string filepath = directoryPath + filename;
-
-	//ユニコード文字列に変換する
-	wchar_t wfilepath[128];
-	int iBufferSize = MultiByteToWideChar(CP_ACP, 0, filepath.c_str(), -1, wfilepath, _countof(wfilepath));
-
-	//// WICテクスチャのロード
-	//result = LoadFromWICFile(L"Resources/tex1.png", WIC_FLAGS_NONE, &metadata, scratchImg);
-	//assert(SUCCEEDED(result));
-
-	result = LoadFromWICFile(
-		wfilepath, WIC_FLAGS_NONE,
-		&metadata, scratchImg
-	);
+	// WICテクスチャのロード
+	result = LoadFromWICFile( L"Resources/tex1.png", WIC_FLAGS_NONE, &metadata, scratchImg);
+	assert(SUCCEEDED(result));
 
 	ScratchImage mipChain{};
 	// ミップマップ生成
@@ -401,30 +394,28 @@ bool Object3d::LoadTexture(const std::string& directoryPath, const std::string& 
 	srvDesc.Texture2D.MipLevels = 1;
 
 	device->CreateShaderResourceView(texbuff.Get(), //ビューと関連付けるバッファ
-									 &srvDesc, //テクスチャ設定情報
-									 cpuDescHandleSRV
+		&srvDesc, //テクスチャ設定情報
+		cpuDescHandleSRV
 	);
-	return true;
+
 }
 
-void Object3d::CreateModel() {
-	HRESULT result = S_FALSE;
-
-	//ファイルストリーム
+void Object3d::CreateModel()
+{
+	//ファイルストリート
 	std::ifstream file;
-	// .objファイルを開く
-	/*file.open("Resources/triangle2/triangle2.obj");*/
-	const string modelname = "triangle_mat";
-	const string filename = modelname + ".obj"; //triangle_mat.obj
-	const string directoryPath = "Resources/" + modelname + "/"; //Resources/triangle_mat/
-	file.open(directoryPath + filename); //Resources/triangle_mat/triangle_mat.obj
 
-	// ファイルオープン失敗をチェック
+	//.objファイルを開く
+	file.open("Resources/triangle/triangle.obj");
+
+	//ファイルオープン失敗をチェック
 	assert(!file.fail());
-	vector<XMFLOAT3> positions; //頂点座標
-	vector<XMFLOAT3> normals;   //法線ベクトル
-	vector<XMFLOAT2> texcoords; //テクスチャUV
-	//1行ずつ読み込み
+
+	vector<XMFLOAT3> positions;		//頂点座標
+	vector<XMFLOAT3> normal;		//法線ベクトル
+	vector<XMFLOAT2> texcoords;		//テクスチャUV
+
+	//1行ずつ読み込む
 	string line;
 	while (getline(file, line)) {
 
@@ -435,91 +426,48 @@ void Object3d::CreateModel() {
 		string key;
 		getline(line_stream, key, ' ');
 
-		//先頭文字列がmtllibならマテリアル
-		if (key == "mtllib") {
-			//マテリアルのファイル名読み込み
-			string filename;
-			line_stream >> filename;
-			//マテリアル読み込み
-			LoadMaterial(directoryPath, filename);
-		}
-
 		//先頭文字列がvなら頂点座標
 		if (key == "v") {
-			//X,Y,Z座標読み込み
+			//x,y,z座標読み込み
 			XMFLOAT3 position{};
 			line_stream >> position.x;
 			line_stream >> position.y;
 			line_stream >> position.z;
+
 			//座標データに追加
 			positions.emplace_back(position);
+
 			//頂点データに追加
-			/*VertexPosNormalUv vertex{};
+			VertexPosNormalUv vertex{};
 			vertex.pos = position;
-			vertices.emplace_back(vertex);*/
+			vertices.emplace_back(vertex);
 		}
 
-		//先頭文字列がvtならテクスチャ
-		if (key == "vt") {
-			//U,V成分読み込み
-			XMFLOAT2 texcoord{};
-			line_stream >> texcoord.x;
-			line_stream >> texcoord.y;
-			//V方向反転
-			texcoord.y = 1.0f - texcoord.y;
-			//座標データに追加
-			texcoords.emplace_back(texcoord);
-
-		}
-
-		//先頭文字列がvnなら法線ベクトル
-		if (key == "vn") {
-			//X,Y,Z座標読み込み
-			XMFLOAT3 normal{};
-			line_stream >> normal.x;
-			line_stream >> normal.y;
-			line_stream >> normal.z;
-			//座標データに追加
-			normals.emplace_back(normal);
-
-		}
-
-		//先頭文字列がfならポリゴン(三角形)
+		//先頭文字列がfならポリゴン
 		if (key == "f") {
+
 			//半角スペース区切りで行の続きを読み込む
 			string index_string;
 			while (getline(line_stream, index_string, ' ')) {
-				//頂点インデックス1個分の文字列をストリームに変換して解析しやすくなる
+				//頂点インデックス一個分の文字列をストリームに変換しえ解析しやすくする
 				std::istringstream index_stream(index_string);
-				unsigned short indexPosition, indexTexcoord, indexNormal;
+				unsigned short indexPosition;
 				index_stream >> indexPosition;
-				index_stream.seekg(1, ios_base::cur); //スラッシュを飛ばす
-				index_stream >> indexTexcoord;
-				index_stream.seekg(1, ios_base::cur); //スラッシュを飛ばす
-				index_stream >> indexNormal;
-				//頂点データの追加
-				VertexPosNormalUv vertex{};
-				vertex.pos = positions[indexPosition - 1];
-				vertex.normal = normals[indexNormal - 1];
-				vertex.uv = texcoords[indexTexcoord - 1];
-				vertices.emplace_back(vertex);
-				//インデックスデータの追加
-				indices.emplace_back((unsigned short)indices.size());
-			}
 
+				//頂点インデックスを追加
+				indices.emplace_back(indexPosition - 1);
+			}
 		}
 	}
-
 	//ファイルを閉じる
 	file.close();
 
+	HRESULT result = S_FALSE;
+
 	std::vector<VertexPosNormalUv> realVertices;
 
-
-	/*UINT sizeVB = static_cast<UINT>(sizeof(vertices));*/
-	UINT sizeVB = static_cast<UINT>(sizeof(VertexPosNormalUv) * vertices.size());
-	/*UINT sizeIB = static_cast<UINT>(sizeof(indices));*/
-	UINT sizeIB = static_cast<UINT>(sizeof(unsigned short) * indices.size());
+	UINT sizeVB = static_cast<UINT>(sizeof(VertexPosNormalUv)*vertices.size());
+	UINT sizeIB = static_cast<UINT>(sizeof(unsigned short)*indices.size());
 
 
 	// ヒーププロパティ
@@ -537,18 +485,18 @@ void Object3d::CreateModel() {
 	VertexPosNormalUv* vertMap = nullptr;
 	result = vertBuff->Map(0, nullptr, (void**)&vertMap);
 	if (SUCCEEDED(result)) {
-		/*memcpy(vertMap, vertices, sizeof(vertices));*/
+		//memcpy(vertMap, vertices, sizeof(vertices));
 		std::copy(vertices.begin(), vertices.end(), vertMap);
 		vertBuff->Unmap(0, nullptr);
 	}
 
 	// 頂点バッファビューの作成
 	vbView.BufferLocation = vertBuff->GetGPUVirtualAddress();
-	/*vbView.SizeInBytes = sizeof(vertices);*/
+	//vbView.SizeInBytes = sizeof(vertices);
 	vbView.SizeInBytes = sizeVB;
 	vbView.StrideInBytes = sizeof(vertices[0]);
 
-
+	//UINT sizeIB = static_cast<UINT>(sizeof(indices));
 	// リソース設定
 	resourceDesc.Width = sizeIB;
 
@@ -561,91 +509,25 @@ void Object3d::CreateModel() {
 	unsigned short* indexMap = nullptr;
 	result = indexBuff->Map(0, nullptr, (void**)&indexMap);
 	if (SUCCEEDED(result)) {
-
-		//// 全インデックスに対して
-		//for (int i = 0; i < _countof(indices); i++)
-		//{
-		//	indexMap[i] = indices[i];	// インデックスをコピー
-		//}
 		std::copy(indices.begin(), indices.end(), indexMap);
-
 		indexBuff->Unmap(0, nullptr);
 	}
 
 	// インデックスバッファビューの作成
 	ibView.BufferLocation = indexBuff->GetGPUVirtualAddress();
 	ibView.Format = DXGI_FORMAT_R16_UINT;
-	/*ibView.SizeInBytes = sizeof(indices);*/
+	//ibView.SizeInBytes = sizeof(indices);
 	ibView.SizeInBytes = sizeIB;
 }
 
-void Object3d::LoadMaterial(const std::string& directoryPath, const std::string& filename) {
-	//ファイルストリーム
-	std::ifstream file;
-	//マテリアルファイルを開く
-	file.open(directoryPath + filename);
-	//ファイルオープン失敗をチェック
-	if (file.fail()) {
-		assert(0);
-	}
-
-	//1行ずつ読み込む
-	string line;
-	while (getline(file, line)) {
-
-		//1行分の文字列をストリームに変換して解析しやすくする
-		std::istringstream line_stream(line);
-
-		//半角スペース区切りで行の先頭文字列を取得
-		string key;
-		getline(line_stream, key, ' ');
-
-		//先頭のタブ文字は無視する
-		if (key[0] == '\t') {
-			key.erase(key.begin()); //先頭の文字を削除
-		}
-
-		//先頭文字列がnewmtlならマテリアル名
-		if (key == "newmtl") {
-			//マテリアル名読み込み
-			line_stream >> material.name;
-		}
-		//先頭文字列がKaならアンビエント色
-		if (key == "Ka") {
-			line_stream >> material.ambient.x;
-			line_stream >> material.ambient.y;
-			line_stream >> material.ambient.z;
-		}
-		//先頭文字列がKdならディフューズ色
-		if (key == "Kd") {
-			line_stream >> material.diffuse.x;
-			line_stream >> material.diffuse.y;
-			line_stream >> material.diffuse.z;
-		}
-		//先頭文字列がKsならスペキュラー色
-		if (key == "Ks") {
-			line_stream >> material.specular.x;
-			line_stream >> material.specular.y;
-			line_stream >> material.specular.z;
-		}
-		//先頭文d字列がmap_Kdならテクスチャファイル名
-		if (key == "map_Kd") {
-			//テクスチャのファイル名読み込み
-			line_stream >> material.textureFilename;
-			//テクスチャ読み込み
-			LoadTexture(directoryPath, material.textureFilename);
-		}
-	}
-	//ファイルを閉じる
-	file.close();
-}
-
-void Object3d::UpdateViewMatrix() {
+void Object3d::UpdateViewMatrix()
+{
 	// ビュー行列の更新
 	matView = XMMatrixLookAtLH(XMLoadFloat3(&eye), XMLoadFloat3(&target), XMLoadFloat3(&up));
 }
 
-bool Object3d::Initialize() {
+bool Object3d::Initialize()
+{
 	// nullptrチェック
 	assert(device);
 
@@ -653,35 +535,22 @@ bool Object3d::Initialize() {
 	CD3DX12_HEAP_PROPERTIES heapProps = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
 	// リソース設定
 	CD3DX12_RESOURCE_DESC resourceDesc =
-		CD3DX12_RESOURCE_DESC::Buffer((sizeof(ConstBufferDataB0) + 0xff) & ~0xff);
+		CD3DX12_RESOURCE_DESC::Buffer((sizeof(ConstBufferData) + 0xff) & ~0xff);
 
 	HRESULT result;
 
 	// 定数バッファの生成
 	result = device->CreateCommittedResource(
 		&heapProps, // アップロード可能
-		D3D12_HEAP_FLAG_NONE,
-		&resourceDesc,
-		D3D12_RESOURCE_STATE_GENERIC_READ,
-		nullptr,
-		IID_PPV_ARGS(&constBuffB0));
-	assert(SUCCEEDED(result));
-
-	resourceDesc = CD3DX12_RESOURCE_DESC::Buffer((sizeof(ConstBufferDataB1) + 0xff) & ~0xff);
-	// 定数バッファの生成
-	result = device->CreateCommittedResource(
-		&heapProps,
-		D3D12_HEAP_FLAG_NONE,
-		&resourceDesc,
-		D3D12_RESOURCE_STATE_GENERIC_READ,
-		nullptr,
-		IID_PPV_ARGS(&constBuffB1));
+		D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr,
+		IID_PPV_ARGS(&constBuff));
 	assert(SUCCEEDED(result));
 
 	return true;
 }
 
-void Object3d::Update() {
+void Object3d::Update()
+{
 	HRESULT result;
 	XMMATRIX matScale, matRot, matTrans;
 
@@ -706,27 +575,19 @@ void Object3d::Update() {
 	}
 
 	// 定数バッファへデータ転送
-	ConstBufferDataB0* constMap = nullptr;
-	result = constBuffB0->Map(0, nullptr, (void**)&constMap);
+	ConstBufferData* constMap = nullptr;
+	result = constBuff->Map(0, nullptr, (void**)&constMap);
+	constMap->color = color;
 	constMap->mat = matWorld * matView * matProjection;	// 行列の合成
-	constBuffB0->Unmap(0, nullptr);
-
-	// 定数バッファへデータ転送01
-	ConstBufferDataB1* constMap1 = nullptr;
-	result = constBuffB1->Map(0, nullptr, (void**)&constMap1);
-	constMap1->ambient = material.ambient; // 行列の合成
-	constMap1->diffuse = material.diffuse;
-	constMap1->specular = material.specular;
-	constMap1->alpha = material.alpha;
-	constBuffB1->Unmap(0, nullptr);
-
+	constBuff->Unmap(0, nullptr);
 }
 
-void Object3d::Draw() {
+void Object3d::Draw()
+{
 	// nullptrチェック
 	assert(device);
 	assert(Object3d::cmdList);
-
+		
 	// 頂点バッファの設定
 	cmdList->IASetVertexBuffers(0, 1, &vbView);
 	// インデックスバッファの設定
@@ -737,11 +598,11 @@ void Object3d::Draw() {
 	cmdList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
 
 	// 定数バッファビューをセット
-	cmdList->SetGraphicsRootConstantBufferView(0, constBuffB0->GetGPUVirtualAddress());
-	cmdList->SetGraphicsRootConstantBufferView(1, constBuffB1->GetGPUVirtualAddress());
+	cmdList->SetGraphicsRootConstantBufferView(0, constBuff->GetGPUVirtualAddress());
 	// シェーダリソースビューをセット
-	cmdList->SetGraphicsRootDescriptorTable(2, gpuDescHandleSRV);
+	cmdList->SetGraphicsRootDescriptorTable(1, gpuDescHandleSRV);
 	// 描画コマンド
-	/*cmdList->DrawIndexedInstanced(_countof(indices), 1, 0, 0, 0);*/
+	//cmdList->DrawIndexedInstanced(_countof(indices), 1, 0, 0, 0);
+
 	cmdList->DrawIndexedInstanced((UINT)indices.size(), 1, 0, 0, 0);
 }
