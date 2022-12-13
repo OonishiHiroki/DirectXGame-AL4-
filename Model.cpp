@@ -1,28 +1,28 @@
-#include "Model.h"
-#include <d3dcompiler.h>
-#include <DirectXTex.h>
-#include <fstream>
-#include <sstream>
-#include <string>
-#include <vector>
-
-using namespace DirectX;
-using namespace Microsoft::WRL;
-using namespace std;
-
-#pragma comment(lib, "d3dcompiler.lib")
-
-D3D12_VERTEX_BUFFER_VIEW Model::vbView{};
-D3D12_INDEX_BUFFER_VIEW Model::ibView{};
-
-ComPtr<ID3D12Resource> Model::vertBuff;
-ComPtr<ID3D12Resource> Model::indexBuff;
-
-ID3D12Device* Model::device = nullptr;
-std::vector<Model::VertexPosNormalUv> Model::vertices;
-std::vector<unsigned short> Model::indices;
-
-Model::Material Model::material;
+//#include "Model.h"
+//#include <d3dcompiler.h>
+//#include <DirectXTex.h>
+//#include <fstream>
+//#include <sstream>
+//#include <string>
+//#include <vector>
+//
+//using namespace DirectX;
+//using namespace Microsoft::WRL;
+//using namespace std;
+//
+//#pragma comment(lib, "d3dcompiler.lib")
+//
+//D3D12_VERTEX_BUFFER_VIEW Model::vbView{};
+//D3D12_INDEX_BUFFER_VIEW Model::ibView{};
+//
+//ComPtr<ID3D12Resource> Model::vertBuff;
+//ComPtr<ID3D12Resource> Model::indexBuff;
+//
+//ID3D12Device* Model::device = nullptr;
+//std::vector<Model::VertexPosNormalUv> Model::vertices;
+//std::vector<unsigned short> Model::indices;
+//
+//Model::Material Model::material;
 
 //void Model::CreateModel() {
 //	HRESULT result = S_FALSE;

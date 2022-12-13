@@ -5,14 +5,12 @@
 #include "Input.h"
 #include "Sprite.h"
 #include "Object3d.h"
-#include "Model.h"
 #include "DebugText.h"
 
 /// <summary>
 /// ゲームシーン
 /// </summary>
-class GameScene
-{
+class GameScene {
 private: // エイリアス
 	// Microsoft::WRL::を省略
 	template <class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
@@ -55,15 +53,12 @@ public: // メンバ関数
 private: // メンバ変数
 	DirectXCommon* dxCommon = nullptr;
 	Input* input = nullptr;
-	DebugText debugText;	
-	Sprite* sprite1 = nullptr;
-	Sprite* sprite2 = nullptr;
+	DebugText debugText;
 
 	/// <summary>
 	/// ゲームシーン用
 	/// </summary>
 	Sprite* spriteBG = nullptr;
 	Object3d* object3d = nullptr;
-	Model* model = nullptr;
 };
 
